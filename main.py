@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import pygame
+import sys
 import config
 import random
 
@@ -26,21 +27,117 @@ def disp(text, colour, pos):
     screen.blit(display, pos)
 
 
+def instructions():
+    showing_options = True
+    while showing_options:
+        screen.fill(config.BLACK)
+        font = pygame.font.Font(config.retro, 40)
+        display = font.render('Instructions', False, config.RED)
+        screen.blit(display, (config.sw / 4 + 200, config.sh * 0.15))
+        font = pygame.font.Font(config.retro, 20)
+        display = font.render('P1: Use the arrow keys to move up, left, down or right.', False, config.GREEN)
+        screen.blit(display, (config.sw / 4, config.sh * 0.45 - 50))
+        display = font.render('P2: Use the "W A S D" keys to move up, left, down or right respectively.', False,
+                              config.GREEN)
+        screen.blit(display, (config.sw / 4, config.sh * 0.45))
+        display = font.render('Reach the other side of the screen to win a round.', False,
+                              config.GREEN)
+        screen.blit(display, (config.sw / 4, config.sh * 0.45 + 50))
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    showing_options = False
+
+        pygame.display.update()
+        clock.tick(60)
+
+
 def intro():
-    display_crash_text = 500
+    display_crash_text = True
+    is_selected = {"button_1": False, "button_2": False}
     while display_crash_text:
+        mouse = pygame.mouse.get_pos()
+
         screen.fill(config.BLACK)
         font = pygame.font.Font(config.retro, 80)
         display = font.render('C Y K ', False, config.GREEN)
-        screen.blit(display, (config.sw / 2 - 100, config.sh / 2 - 100))
-        disp('presents you', config.RED, (config.sw / 2 - 70, config.sh
-                                          / 2))
+        screen.blit(display, (config.sw / 2 - 200, config.sh / 4 - 100))
+        disp('presents you', config.RED, (config.sw / 2 - 170, config.sh
+                                          / 4))
         font = pygame.font.Font(config.retro, 30)
         display = font.render('THIS AINT MY LAST RIDE', False,
                               config.BLUE)
-        screen.blit(display, (config.sw / 2 - 100, config.sh / 2 + 40))
-        display_crash_text -= 1
-        pygame.display.flip()
+        screen.blit(display, (config.sw / 2 - 200, config.sh / 4 + 40))
+        button_1 = pygame.Rect(
+            int(config.sw / 2) - 150,
+            int(config.sh / 2) - 40, 200, 50)
+        button_2 = pygame.Rect(
+            int(config.sw / 2) - 150,
+            int(config.sh / 2) + 40, 200, 50)
+        if is_selected["button_1"]:
+            pygame.draw.rect(screen, config.WHITE, button_1)
+            font = pygame.font.Font(config.retro, 20)
+            display = font.render("Play", False, config.RED)
+            screen.blit(display, (config.sw / 2 - 140, config.sh / 2 - 25))
+
+        else:
+            pygame.draw.rect(screen, config.RED, button_1)
+            font = pygame.font.Font(config.retro, 20)
+            display = font.render("Play", False, config.WHITE)
+            screen.blit(display, (config.sw / 2 - 140, config.sh / 2 - 25))
+        if is_selected["button_2"]:
+            pygame.draw.rect(screen, config.WHITE, button_2)
+            font = pygame.font.Font(config.retro, 20)
+            display = font.render("Instructions", False, config.RED)
+            screen.blit(display, (config.sw / 2 - 140, config.sh / 2 + 55))
+        else:
+            pygame.draw.rect(screen, config.RED, button_2)
+            font = pygame.font.Font(config.retro, 20)
+            display = font.render("Instructions", False, config.WHITE)
+            screen.blit(display, (config.sw / 2 - 140, config.sh / 2 + 55))
+        if button_1.collidepoint(*mouse):
+            is_selected["button_1"] = True
+            is_selected["button_2"] = False
+        elif button_2.collidepoint(*mouse):
+            is_selected["button_2"] = True
+            is_selected["button_1"] = False
+        elif pygame.mouse.get_rel() != (0, 0):
+            for button in is_selected:
+                is_selected[button] = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                if event.key == pygame.K_SPACE:
+                    if is_selected["button_1"]:
+                        display_crash_text = False
+                    elif is_selected["button_2"]:
+                        instructions()
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
+                    is_selected["button_1"] = True
+                    is_selected["button_2"] = False
+                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                    is_selected["button_1"] = False
+                    is_selected["button_2"] = True
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if is_selected["button_1"]:
+                        display_crash_text = False
+                    elif is_selected["button_2"]:
+                        instructions()
+
+        pygame.display.update()
+        clock.tick(60)
 
 
 def crash(x):
