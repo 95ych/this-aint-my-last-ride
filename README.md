@@ -13,6 +13,23 @@ New enemies and no. of obstacles increase after every round.
 >
 If a player wins a particular round the enemy speed increases in the next round.
 
+### INSTRUCTIONS
+
+> To start the game run the command 
+
+```python 
+    python3 main.py
+```
+> Requirements: library: pygame
+ 
+> Install it using the below command
+
+> ```python
+>   pip3 install pygame
+> ```
+
+
+
 ### Game design
 >Controls :
 UP DOWN LEFT RIGHT : for Player1 \
